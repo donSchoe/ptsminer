@@ -2,8 +2,12 @@ Copyright (c) 2009-2013 Bitcoin Developers
 
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
-This product includes software developed by the OpenSSL Project for use in the [OpenSSL Toolkit](http://www.openssl.org/). This product includes
-cryptographic software written by Eric Young ([eay@cryptsoft.com](mailto:eay@cryptsoft.com)), and UPnP software written by Thomas Bernard.
+This product includes software developed by the OpenSSL Project for
+use in the [OpenSSL Toolkit](http://www.openssl.org/). This product
+includes cryptographic software written by Eric Young
+([eay@cryptsoft.com](mailto:eay@cryptsoft.com)), and UPnP software
+written by Thomas Bernard.
+
 
 UNIX BUILD NOTES
 ====================
@@ -11,119 +15,99 @@ UNIX BUILD NOTES
 To Build
 ---------------------
 
-	cd src/
-	make -f makefile.unix		# Headless bitcoin
-
-See readme-qt.rst for instructions on building Bitcoin-Qt, the graphical user interface.
+  cd src/
+  make -f makefile.unix   # Headless ptsminer
 
 Dependencies
 ---------------------
 
- Library     Purpose           Description
- -------     -------           -----------
- libssl      SSL Support       Secure communications
- libdb4.8    Berkeley DB       Blockchain & wallet storage
- libboost    Boost             C++ Library
- miniupnpc   UPnP Support      Optional firewall-jumping support
+Required:
+ - libssl (SSL Support)
+ - libdb4.8 (Berkeley DB)
+ - libboost (Boost C++ Library)
+ - libgmp (GNU Multiprecision)
 
-[miniupnpc](http://miniupnp.free.fr/) may be used for UPnP port mapping.  It can be downloaded from [here](
-http://miniupnp.tuxfamily.org/files/).  UPnP support is compiled in and
-turned off by default.  Set USE_UPNP to a different value to control this:
+Optional:
+ - miniupnpc (UPnP Support)
 
-	USE_UPNP=     No UPnP support miniupnp not required
-	USE_UPNP=0    (the default) UPnP support turned off by default at runtime
-	USE_UPNP=1    UPnP support turned on by default at runtime
-
-IPv6 support may be disabled by setting:
-
-	USE_IPV6=0    Disable IPv6 support
+Versions used in this release:
+ - GCC           4.3.3
+ - OpenSSL       1.0.1c
+ - Berkeley DB   4.8.30.NC (not 5.x!)
+ - Boost         1.48
+ - GMP           5.0.2
+ - miniupnpc     1.6
 
 Licenses of statically linked libraries:
- Berkeley DB   New BSD license with additional requirement that linked
-               software must be free open source
- Boost         MIT-like license
- miniupnpc     New (3-clause) BSD license
+ - Berkeley DB: New BSD license with additional requirement that linked software must be free open source
+ - Boost: MIT-like license
+ - miniupnpc: New (3-clause) BSD license
 
-- Versions used in this release:
--  GCC           4.3.3
--  OpenSSL       1.0.1c
--  Berkeley DB   4.8.30.NC
--  Boost         1.37
--  miniupnpc     1.6
 
 Dependency Build Instructions: Ubuntu & Debian
 ----------------------------------------------
 Build requirements:
 
-	sudo apt-get install build-essential
-	sudo apt-get install libssl-dev
+  sudo apt-get install build-essential libssl-dev libboost-all-dev libgmp-dev
 
-for Ubuntu 12.04:
+Berkeley db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin):
 
-	sudo apt-get install libboost-all-dev
+  sudo add-apt-repository ppa:bitcoin/bitcoin
+  sudo apt-get update
+  sudo apt-get install libdb4.8-dev libdb4.8++-dev
 
- db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin).
+Ubuntu precise has packages for libdb5.1-dev and libdb5.1++-dev,
+but using these will break binary wallet compatibility, and is not recommended.
 
- Ubuntu precise has packages for libdb5.1-dev and libdb5.1++-dev,
- but using these will break binary wallet compatibility, and is not recommended.
+If you have trouble with libboost dependencies, make sure these are installed:
 
-for other Ubuntu & Debian:
+  sudo apt-get install libboost-chrono1.48-dev libboost-filesystem1.48-dev libboost-system1.48-dev libboost-program-options1.48-dev libboost-thread1.48-dev
 
-	sudo apt-get install libdb4.8-dev
-	sudo apt-get install libdb4.8++-dev
-	sudo apt-get install libboost1.37-dev
- (If using Boost 1.37, append -mt to the boost libraries in the makefile)
+(If using Boost 1.37, append -mt to the boost libraries in the makefile,
+use `apt-cache search libboost` to find out which version is available for your system.)
 
 Optional:
 
-	sudo apt-get install libminiupnpc-dev (see USE_UPNP compile flag)
+  sudo apt-get install libminiupnpc-dev
+
+[miniupnpc](http://miniupnp.free.fr/) may be used for UPnP port mapping.
+It can be downloaded from [here](http://miniupnp.tuxfamily.org/files/).
+UPnP support is compiled in and turned off by default.
+Set USE_UPNP to a different value to control this:
+
+  USE_UPNP=    No UPnP support miniupnp not required
+  USE_UPNP=0    (the default) UPnP support turned off by default at runtime
+  USE_UPNP=1    UPnP support turned on by default at runtime
+
+IPv6 support may be disabled by setting:
+
+  USE_IPV6=0    Disable IPv6 support
 
 
-Dependency Build Instructions: Gentoo
--------------------------------------
+Compiling Berkeley DB
+---------------------
+You need Berkeley DB 4.8. If you have to build Berkeley DB yourself:
 
-Note: If you just want to install bitcoind on Gentoo, you can add the Bitcoin overlay and use your package manager:
-
-	layman -a bitcoin && emerge bitcoind
-	emerge -av1 --noreplace boost glib openssl sys-libs/db:4.8
-
-Take the following steps to build (no UPnP support):
-
-	cd ${BITCOIN_DIR}/src
-	make -f makefile.unix USE_UPNP= USE_IPV6=1 BDB_INCLUDE_PATH='/usr/include/db4.8'
-	strip bitcoind
+  ../dist/configure --enable-cxx
+  make
 
 
-Notes
------
-The release is built with GCC and then "strip bitcoind" to strip the debug
-symbols, which reduces the executable size by about 90%.
-
-
-miniupnpc
----------
-	tar -xzvf miniupnpc-1.6.tar.gz
-	cd miniupnpc-1.6
-	make
-	sudo su
-	make install
-
-
-Berkeley DB
------------
-You need Berkeley DB 4.8.  If you have to build Berkeley DB yourself:
-
-	../dist/configure --enable-cxx
-	make
-
-
-Boost
------
+Compiling Boost
+---------------
 If you need to build Boost yourself:
 
-	sudo su
-	./bootstrap.sh
-	./bjam install
+  sudo su
+  ./bootstrap.sh
+  ./bjam install
+
+
+Compiling miniupnpc
+-------------------
+  tar -xzvf miniupnpc-1.6.tar.gz
+  cd miniupnpc-1.6
+  make
+  sudo su
+  make install
 
 
 Security
@@ -143,11 +127,11 @@ exploit even if a vulnerability is found, you can take the following measures:
 
     To build with PIE, use:
 
-    	make -f makefile.unix ... -e PIE=1
+      make -f makefile.unix ... -e PIE=1
 
     To test that you have built PIE executable, install scanelf, part of paxutils, and use:
 
-    	scanelf -e ./bitcoin
+      scanelf -e ./bitcoin
 
     The output should contain:
      TYPE
@@ -164,7 +148,7 @@ exploit even if a vulnerability is found, you can take the following measures:
     `scanelf -e ./bitcoin`
 
     the output should contain:
-	STK/REL/PTL
-	RW- R-- RW-
+  STK/REL/PTL
+  RW- R-- RW-
 
     The STK RW- means that the stack is readable and writeable but not executable.
