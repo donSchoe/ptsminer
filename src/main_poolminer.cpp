@@ -109,7 +109,7 @@ void convertDataToBlock(unsigned char* blockData, CBlock& block) {
 
   nNetworkBits = CBigNum().SetCompact(block.nBits).getuint256();
 
-  //nShareBits =  *((unsigned int *)(blockData + 80)); 
+  //nShareBits =  *((unsigned int *)(blockData + 80));
 
   //nShareBits = CBigNum().SetHex(*((unsigned char *)(blockData + 80))).GetCompact();
 }
@@ -124,7 +124,7 @@ public:
 	CBlockProviderGW() : CBlockProvider(), nTime_offset(0), _blocks(NULL) {}
 
 	virtual ~CBlockProviderGW() { /* TODO */ }
-	
+
 	virtual unsigned int GetAdjustedTimeWithOffset(unsigned int thread_id) {
 		return nTime_offset + ((((unsigned int)GetAdjustedTime() + thread_num_max) / thread_num_max) * thread_num_max) + thread_id;
 	}
@@ -150,7 +150,7 @@ public:
 		//
 		unsigned int nTime_local = GetAdjustedTime();
 		unsigned int nTime_server = blocks->nTime;
-		nTime_offset = nTime_local > nTime_server ? 0 : (nTime_server-nTime_local);		
+		nTime_offset = nTime_local > nTime_server ? 0 : (nTime_server-nTime_local);
 		//
 		CBlock* old_blocks = NULL;
 		{
@@ -464,7 +464,7 @@ private:
 //  			  ((valid+blocks > 0) ? (static_cast<double>(it->second) / (static_cast<double>((t_end - t_start).total_seconds()) / 3600.0)) : 0.0) << "/h), ";
 		if (valid+blocks+rejects+stale > 0) {
             char buff[100];
-            sprintf(buff, "hashmeter %f khash/s\n", dHashesPerSec);
+            sprintf(buff, "hashmeter %f hashs/min\n", dHashesPerSec);
             //std::string buffAsStdStr = buff;
         std::cout << buff;
 		std::cout << "VL: " << valid+blocks << " (" << (static_cast<double>(valid+blocks) / static_cast<double>(valid+blocks+rejects+stale)) * 100.0 << "%), ";
@@ -634,7 +634,7 @@ int main(int argc, char **argv)
     std::cerr << "usage: " << "please use a miner id between [0 , 65535]" << std::endl;
     return EXIT_FAILURE;
   }
-  
+
   { //password to sha1
     boost::uuids::detail::sha1 sha;
     sha.process_bytes(pool_password.c_str(), pool_password.size());
