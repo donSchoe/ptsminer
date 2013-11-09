@@ -19,10 +19,10 @@
 #include <boost/uuid/sha1.hpp>
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 #define VERSION_EXT "RC1"
 
-#define MAX_THREADS 32
+#define MAX_THREADS 64
 
 // <START> be compatible to original code (not actually used!)
 #include "txdb.h"
@@ -109,7 +109,6 @@ void convertDataToBlock(unsigned char* blockData, CBlock& block) {
   nNetworkBits = CBigNum().SetCompact(block.nBits).getuint256();
 
   //nShareBits =  *((unsigned int *)(blockData + 80));
-
   //nShareBits = CBigNum().SetHex(*((unsigned char *)(blockData + 80))).GetCompact();
 }
 
@@ -575,9 +574,8 @@ int main(int argc, char **argv)
 {
   std::cout << "********************************************" << std::endl;
   std::cout << "*** ptsminer - Pts Pool Miner v" << VERSION_MAJOR << "." << VERSION_MINOR << " " << VERSION_EXT << std::endl;
-  //std::cout << "*** by xolokram/TB - www.beeeeer.org - glhf" << std::endl;
+  std::cout << "*** by xolokram/TB - www.beeeeer.org - glhf" << std::endl;
   std::cout << "***" << std::endl;
-  //std::cout << "*** thx to Sunny King & mikaelh" << std::endl;
   std::cout << "*** press CTRL+C to exit" << std::endl;
   std::cout << "********************************************" << std::endl;
 
