@@ -21,7 +21,7 @@ USE_UPNP:=-
 USE_IPV6:=1
 
 DEPSDIR?=/usr/local
-BOOST_SUFFIX?=-mgw46-mt-sd-1_52
+BOOST_SUFFIX?=-mgw47-mt-s-1_54
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
@@ -78,7 +78,6 @@ OBJS= \
     obj/crypter.o \
     obj/key.o \
     obj/db.o \
-    obj/init.o \
     obj/keystore.o \
     obj/main.o \
     obj/net.o \
@@ -102,7 +101,7 @@ OBJS= \
     obj/txdb.o
 
 
-all: bitcoind.exe
+all: ptsminer.exe
 
 test check: test_bitcoin.exe FORCE
 	test_bitcoin.exe
@@ -119,7 +118,7 @@ leveldb/libleveldb.a:
 obj/%.o: %.cpp $(HEADERS)
 	$(CXX) -c $(CFLAGS) -o $@ $<
 
-bitcoind.exe: $(OBJS:obj/%=obj/%)
+ptsminer.exe: $(OBJS:obj/%=obj/%) obj/main_poolminer.o
 	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
 TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))

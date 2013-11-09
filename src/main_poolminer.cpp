@@ -19,8 +19,8 @@
 #include <boost/uuid/sha1.hpp>
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 1
-#define VERSION_EXT "Beta"
+#define VERSION_MINOR 2
+#define VERSION_EXT "RC1"
 
 #define MAX_THREADS 32
 
