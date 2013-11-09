@@ -105,8 +105,7 @@ void convertDataToBlock(unsigned char* blockData, CBlock& block) {
   block.nNonce                 = *((unsigned int *)(blockData + 76));
   block.nBirthdayA = 0;
   block.nBirthdayB = 0;
-
-
+  
   nNetworkBits = CBigNum().SetCompact(block.nBits).getuint256();
 
   //nShareBits =  *((unsigned int *)(blockData + 80));
@@ -171,9 +170,7 @@ public:
 		blockraw.nNonce         = block->nNonce;
 		blockraw.nBirthdayA     = block->nBirthdayA;
         blockraw.nBirthdayB     = block->nBirthdayB;
-		//std::cout << "submit: " << block->hashMerkleRoot.ToString().c_str() << std::endl;
-
-
+		
 		boost::posix_time::ptime submit_start = boost::posix_time::second_clock::universal_time();
 		boost::system::error_code submit_error = boost::asio::error::host_not_found; //run at least 1 time
 		++submitting_share;
@@ -363,7 +360,6 @@ public:
 					CBlockIndex *pindexOld = pindexBest;
 					pindexBest = new CBlockIndex(); //=notify worker (this could need a efficient alternative)
 					delete pindexOld;
-
 				} break;
 				case 1: {
 					size_t buf_size = 4;
@@ -382,7 +378,7 @@ public:
 						break;
 					}
 					if (len == buf_size) {
-						int retval = buf > 100000 ? 1 : buf;
+						int retval = buf > 1000 ? 1 : buf;
 						std::cout << "[MASTER] submitted share -> " <<
 							(retval == 0 ? "REJECTED" : retval < 0 ? "STALE" : retval ==
 							1 ? "BLOCK" : "SHARE") << std::endl;
