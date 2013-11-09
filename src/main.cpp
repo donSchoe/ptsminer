@@ -4638,6 +4638,8 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
 		uint256 testHash;
         for(;;)
         {
+			static int64 nHashCounter;
+			
             unsigned int nHashesDone = 0;
             unsigned int nNonceFound = (unsigned int) -1;
 
@@ -4691,7 +4693,6 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
             }
 
             // Meter hashes/sec
-            static int64 nHashCounter;
             if (nHPSTimerStart == 0)
             {
                 nHPSTimerStart = GetTimeMillis();
