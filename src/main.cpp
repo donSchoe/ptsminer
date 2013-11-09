@@ -4644,7 +4644,7 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
             unsigned int nNonceFound = (unsigned int) -1;
 
         bool outdated = false;
-		for(int i=0;i<1;i++){
+		for(int i=0;i<1;i++){ // <-- wtf is this?
 			pblock->nNonce=pblock->nNonce+1;
 			testHash=pblock->CalculateBestBirthdayHash(pindexPrev, outdated);
 			nHashesDone++;
@@ -4658,10 +4658,9 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
 				break;
 			}
 		}
-		if (outdated) {
-			nHashCounter += nHashesDone;
+		nHashCounter += nHashesDone;
+		if (outdated)
 			break;
-		}
 		
             // Check if something found
             if (nNonceFound != (unsigned int) -1)
@@ -4698,8 +4697,6 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
                 nHPSTimerStart = GetTimeMillis();
                 nHashCounter = 0;
             }
-            else
-                nHashCounter += nHashesDone;
             if (GetTimeMillis() - nHPSTimerStart > 4000*60)
             {
                 static CCriticalSection cs;
