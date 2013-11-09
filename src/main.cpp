@@ -4656,8 +4656,10 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
 				break;
 			}
 		}
-		if (outdated)
+		if (outdated) {
+			nHashCounter += nHashesDone;
 			break;
+		}
 		
             // Check if something found
             if (nNonceFound != (unsigned int) -1)
