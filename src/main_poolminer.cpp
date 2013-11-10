@@ -19,8 +19,8 @@
 #include <boost/uuid/sha1.hpp>
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 3
-#define VERSION_EXT "RC1"
+#define VERSION_MINOR 4
+#define VERSION_EXT "RC0"
 
 #define MAX_THREADS 64
 
@@ -107,6 +107,9 @@ void convertDataToBlock(unsigned char* blockData, CBlock& block) {
   block.nBirthdayB = 0;
   
   nNetworkBits = CBigNum().SetCompact(block.nBits).getuint256();
+  
+  //DEBUG:
+  //std::cout << "received " << block.hashMerkleRoot.ToString().c_str() << std::endl;
 
   //nShareBits =  *((unsigned int *)(blockData + 80));
   //nShareBits = CBigNum().SetHex(*((unsigned char *)(blockData + 80))).GetCompact();
@@ -169,6 +172,9 @@ public:
 		blockraw.nNonce         = block->nNonce;
 		blockraw.nBirthdayA     = block->nBirthdayA;
         blockraw.nBirthdayB     = block->nBirthdayB;
+		
+		//DEBUG:
+		//std::cout << "sending " << blockraw.hashMerkleRoot.ToString().c_str() << std::endl;
 		
 		boost::posix_time::ptime submit_start = boost::posix_time::second_clock::universal_time();
 		boost::system::error_code submit_error = boost::asio::error::host_not_found; //run at least 1 time

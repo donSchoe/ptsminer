@@ -9,7 +9,7 @@ namespace bts
 	#define SEARCH_SPACE_BITS 50
 	#define BIRTHDAYS_PER_HASH 8
 	
-	std::vector< std::pair<uint32_t,uint32_t> > momentum_search( uint256 midHash )
+	std::vector< std::pair<uint32_t,uint32_t> > momentum_search( uint256 midHash, CBlockIndex* pindexPrev, CBlockIndex** pindexBest )
   {
 			semiOrderedMap somap;
 			somap.allocate(4);
@@ -36,6 +36,11 @@ namespace bts
               if( foundMatch != 0 ){
                   results.push_back( std::make_pair( foundMatch, nonce ) );
               }
+			  
+				if (pindexPrev != *pindexBest) {
+					somap.destroy();
+					return results;
+				}
           }
           i += BIRTHDAYS_PER_HASH;
       }

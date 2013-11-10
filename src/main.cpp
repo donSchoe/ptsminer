@@ -1329,10 +1329,16 @@ uint256 CBlockHeader::GetHash() const
 uint256 CBlockHeader::CalculateBestBirthdayHash(CBlockIndex* pindexPrev, bool &outdated) {
 				
 		uint256 midHash = GetMidHash();		
-		std::vector< std::pair<uint32_t,uint32_t> > results =bts::momentum_search( midHash );
+		std::vector< std::pair<uint32_t,uint32_t> > results =bts::momentum_search( midHash, pindexPrev, &pindexBest);
 		uint32_t candidateBirthdayA=0;
 		uint32_t candidateBirthdayB=0;
 		uint256 smallestHashSoFar("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+		
+		if (pindexPrev != pindexBest) {
+			outdated = true;
+            return smallestHashSoFar;
+		}
+		
 		for (unsigned i=0; i < results.size(); i++) {
 			nBirthdayA = results[i].first;
 			nBirthdayB = results[i].second;
@@ -4650,8 +4656,10 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
 			nHashesDone++;
 			//printf("testHash %s\n", testHash.ToString().c_str());
 			//printf("Hash Target %s\n", hashTarget.ToString().c_str());
-			if (outdated)
+			if (outdated) {
+				//fprintf( stderr, "new work for thread %i\n" , thread_id );
 				break;
+			}
 			if(testHash<hashTarget) {
 				nNonceFound=pblock->nNonce;
 				printf("Found Hash %s\n", testHash.ToString().c_str());
