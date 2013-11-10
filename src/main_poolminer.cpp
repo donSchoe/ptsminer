@@ -555,7 +555,7 @@ BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
 	return FALSE;
 }
 
-#elif defined(__GNUG__)
+#elif defined(__GNUG__) && !defined(__APPLE__)
 
 static sighandler_t set_signal_handler (int signum, sighandler_t signalhandler) {
    struct sigaction new_sig, old_sig;
@@ -571,7 +571,7 @@ void ctrl_handler(int signum) {
 	exit(1);
 }
 
-#endif //TODO: __APPLE__ ?
+#endif
 
 /*********************************
 * main - this is where it begins
@@ -590,9 +590,9 @@ int main(int argc, char **argv)
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
   SetConsoleCtrlHandler(ctrl_handler, TRUE);
-#elif defined(__GNUG__)
+#elif defined(__GNUG__) && !defined(__APPLE__)
   set_signal_handler(SIGINT, ctrl_handler);
-#endif //TODO: __APPLE__
+#endif
 
   if (argc < 2)
   {
