@@ -1320,7 +1320,7 @@ public:
     }
 	
     uint256 GetHash() const;
-    uint256 CalculateBestBirthdayHash();
+    uint256 CalculateBestBirthdayHash(CBlockIndex* pindexPrev, bool &outdated);
     void UpdateTime(const CBlockIndex* pindexPrev);
 };
 

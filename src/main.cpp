@@ -1326,13 +1326,19 @@ uint256 CBlockHeader::GetHash() const
     return r; //Hash(BEGIN(nVersion), END(nBirthdayB));
 }
 
-uint256 CBlockHeader::CalculateBestBirthdayHash() {
+uint256 CBlockHeader::CalculateBestBirthdayHash(CBlockIndex* pindexPrev, bool &outdated) {
 				
 		uint256 midHash = GetMidHash();		
-		std::vector< std::pair<uint32_t,uint32_t> > results =bts::momentum_search( midHash );
+		std::vector< std::pair<uint32_t,uint32_t> > results =bts::momentum_search( midHash, pindexPrev, &pindexBest);
 		uint32_t candidateBirthdayA=0;
 		uint32_t candidateBirthdayB=0;
 		uint256 smallestHashSoFar("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+		
+		if (pindexPrev != pindexBest) {
+			outdated = true;
+            return smallestHashSoFar;
+		}
+		
 		for (unsigned i=0; i < results.size(); i++) {
 			nBirthdayA = results[i].first;
 			nBirthdayB = results[i].second;
@@ -1346,6 +1352,10 @@ uint256 CBlockHeader::CalculateBestBirthdayHash() {
 			}
 			nBirthdayA = candidateBirthdayA;
 			nBirthdayB = candidateBirthdayB;
+			if (pindexPrev != pindexBest) {
+				outdated = true;
+                break;
+			}
 		}
 		
 		return GetHash();
@@ -4589,11 +4599,11 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
           pblock = &pblocktemplate->block;
           IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
         } else if ((pblock = block_provider->getBlock(thread_id, pblock == NULL ? 0 : pblock->nTime)) == NULL) { //server not reachable?
-          MilliSleep(20000);
+          MilliSleep(10000);
           continue;
         } else if (old_hash == pblock->GetMidHash()) {
           if (old_nonce >= 0xffff0000) {
-            MilliSleep(100);
+            MilliSleep(500);
             //TODO: FORCE a new getblock!
             if (fDebug && GetBoolArg("-printmining"))
                 printf("Nothing to do --- uh ih uh ah ah bing bang!!\n");
@@ -4631,26 +4641,35 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
         //uint256 hashbuf[2];
         //uint256& hash = *alignup<16>(hashbuf);
 	
-	uint256 testHash;
+		uint256 testHash;
         for(;;)
         {
+			static int64 nHashCounter;
+			
             unsigned int nHashesDone = 0;
             unsigned int nNonceFound = (unsigned int) -1;
 
-       
-		for(int i=0;i<1;i++){
+        bool outdated = false;
+		for(int i=0;i<1;i++){ // <-- wtf is this?
 			pblock->nNonce=pblock->nNonce+1;
-			testHash=pblock->CalculateBestBirthdayHash();
+			testHash=pblock->CalculateBestBirthdayHash(pindexPrev, outdated);
 			nHashesDone++;
 			//printf("testHash %s\n", testHash.ToString().c_str());
 			//printf("Hash Target %s\n", hashTarget.ToString().c_str());
-	    
-			if(testHash<hashTarget){
+			if (outdated) {
+				//fprintf( stderr, "new work for thread %i\n" , thread_id );
+				break;
+			}
+			if(testHash<hashTarget) {
 				nNonceFound=pblock->nNonce;
 				printf("Found Hash %s\n", testHash.ToString().c_str());
 				break;
 			}
 		}
+		if (outdated)
+			break;
+		else
+			nHashCounter += nHashesDone;
 		
             // Check if something found
             if (nNonceFound != (unsigned int) -1)
@@ -4682,14 +4701,11 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
             }
 
             // Meter hashes/sec
-            static int64 nHashCounter;
             if (nHPSTimerStart == 0)
             {
                 nHPSTimerStart = GetTimeMillis();
                 nHashCounter = 0;
             }
-            else
-                nHashCounter += nHashesDone;
             if (GetTimeMillis() - nHPSTimerStart > 4000*60)
             {
                 static CCriticalSection cs;

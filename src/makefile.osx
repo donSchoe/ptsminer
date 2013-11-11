@@ -81,7 +81,6 @@ OBJS= \
     obj/crypter.o \
     obj/key.o \
     obj/db.o \
-    obj/init.o \
     obj/keystore.o \
     obj/main.o \
     obj/net.o \
@@ -120,7 +119,7 @@ ifneq (${USE_IPV6}, -)
 	DEFS += -DUSE_IPV6=$(USE_IPV6)
 endif
 
-all: bitcoind
+all: ptsminer
 
 test check: test_bitcoin FORCE
 	./test_bitcoin
@@ -150,7 +149,7 @@ obj/%.o: %.cpp
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
 	  rm -f $(@:%.o=%.d)
 
-bitcoind: $(OBJS:obj/%=obj/%)
+ptsminer: $(OBJS:obj/%=obj/%) obj/main_poolminer.o
 	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
 TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))

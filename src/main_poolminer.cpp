@@ -19,10 +19,10 @@
 #include <boost/uuid/sha1.hpp>
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 1
-#define VERSION_EXT "Beta"
+#define VERSION_MINOR 4
+#define VERSION_EXT "RC0"
 
-#define MAX_THREADS 32
+#define MAX_THREADS 64
 
 // <START> be compatible to original code (not actually used!)
 #include "txdb.h"
@@ -105,12 +105,13 @@ void convertDataToBlock(unsigned char* blockData, CBlock& block) {
   block.nNonce                 = *((unsigned int *)(blockData + 76));
   block.nBirthdayA = 0;
   block.nBirthdayB = 0;
-
-
+  
   nNetworkBits = CBigNum().SetCompact(block.nBits).getuint256();
+  
+  //DEBUG:
+  //std::cout << "received " << block.hashMerkleRoot.ToString().c_str() << std::endl;
 
   //nShareBits =  *((unsigned int *)(blockData + 80));
-
   //nShareBits = CBigNum().SetHex(*((unsigned char *)(blockData + 80))).GetCompact();
 }
 
@@ -171,9 +172,10 @@ public:
 		blockraw.nNonce         = block->nNonce;
 		blockraw.nBirthdayA     = block->nBirthdayA;
         blockraw.nBirthdayB     = block->nBirthdayB;
-		//std::cout << "submit: " << block->hashMerkleRoot.ToString().c_str() << std::endl;
-
-
+		
+		//DEBUG:
+		//std::cout << "sending " << blockraw.hashMerkleRoot.ToString().c_str() << std::endl;
+		
 		boost::posix_time::ptime submit_start = boost::posix_time::second_clock::universal_time();
 		boost::system::error_code submit_error = boost::asio::error::host_not_found; //run at least 1 time
 		++submitting_share;
@@ -363,7 +365,6 @@ public:
 					CBlockIndex *pindexOld = pindexBest;
 					pindexBest = new CBlockIndex(); //=notify worker (this could need a efficient alternative)
 					delete pindexOld;
-
 				} break;
 				case 1: {
 					size_t buf_size = 4;
@@ -382,7 +383,7 @@ public:
 						break;
 					}
 					if (len == buf_size) {
-						int retval = buf > 100000 ? 1 : buf;
+						int retval = buf > 1000 ? 1 : buf;
 						std::cout << "[MASTER] submitted share -> " <<
 							(retval == 0 ? "REJECTED" : retval < 0 ? "STALE" : retval ==
 							1 ? "BLOCK" : "SHARE") << std::endl;
@@ -554,7 +555,7 @@ BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
 	return FALSE;
 }
 
-#elif defined(__GNUG__)
+#elif defined(__GNUG__) && !defined(__APPLE__)
 
 static sighandler_t set_signal_handler (int signum, sighandler_t signalhandler) {
    struct sigaction new_sig, old_sig;
@@ -570,7 +571,7 @@ void ctrl_handler(int signum) {
 	exit(1);
 }
 
-#endif //TODO: __APPLE__ ?
+#endif
 
 /*********************************
 * main - this is where it begins
@@ -579,9 +580,8 @@ int main(int argc, char **argv)
 {
   std::cout << "********************************************" << std::endl;
   std::cout << "*** ptsminer - Pts Pool Miner v" << VERSION_MAJOR << "." << VERSION_MINOR << " " << VERSION_EXT << std::endl;
-  //std::cout << "*** by xolokram/TB - www.beeeeer.org - glhf" << std::endl;
+  std::cout << "*** by xolokram/TB - www.beeeeer.org - glhf" << std::endl;
   std::cout << "***" << std::endl;
-  //std::cout << "*** thx to Sunny King & mikaelh" << std::endl;
   std::cout << "*** press CTRL+C to exit" << std::endl;
   std::cout << "********************************************" << std::endl;
 
@@ -590,9 +590,9 @@ int main(int argc, char **argv)
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
   SetConsoleCtrlHandler(ctrl_handler, TRUE);
-#elif defined(__GNUG__)
+#elif defined(__GNUG__) && !defined(__APPLE__)
   set_signal_handler(SIGINT, ctrl_handler);
-#endif //TODO: __APPLE__
+#endif
 
   if (argc < 2)
   {
