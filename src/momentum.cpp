@@ -35,6 +35,8 @@ namespace bts
               uint64_t foundMatch=somap.checkAdd( birthday, nonce );
               if( foundMatch != 0 ){
                   results.push_back( std::make_pair( foundMatch, nonce ) );
+                  // Reduce stales by immedately returning on first collision.
+                  return results;
               }
           }
           i += BIRTHDAYS_PER_HASH;
