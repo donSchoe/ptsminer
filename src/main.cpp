@@ -4711,18 +4711,18 @@ void BitcoinMiner(CWallet *pwallet, CBlockProvider *block_provider, unsigned int
                 static CCriticalSection cs;
                 {
                     LOCK(cs);
-                    if (GetTimeMillis() - nHPSTimerStart > 4000*60)
-                    {
-                        dHashesPerSec = 1000.0 * nHashCounter *60/ (GetTimeMillis() - nHPSTimerStart);
-                        nHPSTimerStart = GetTimeMillis();
-                        nHashCounter = 0;
-                        static int64 nLogTime;
-                        if (GetTime() - nLogTime > 30 * 60)
-                        {
-                            nLogTime = GetTime();
-                            printf("hashmeter %6.0f khash/s\n", dHashesPerSec/1000.0);
-                        }
-                    }
+                    //if (GetTimeMillis() - nHPSTimerStart > 4000*60)
+                    //{
+                    //    dHashesPerSec = 1000.0 * nHashCounter *60/ (GetTimeMillis() - nHPSTimerStart);
+                    //    nHPSTimerStart = GetTimeMillis();
+                    //    nHashCounter = 0;
+                    //    static int64 nLogTime;
+                    //    if (GetTime() - nLogTime > 30 * 60)
+                    //    {
+                    //        nLogTime = GetTime();
+                    //        printf("hashmeter %6.0f hashs/min\n", dHashesPerSec/1000.0);
+                    //    }
+                    //}
                 }
             }
             old_nonce = pblock->nNonce;
